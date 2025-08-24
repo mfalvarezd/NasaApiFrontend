@@ -8,34 +8,28 @@ import { useApod, useRecentApods, useRandomApods } from '@/hooks/useApod';
 export default function HomePage() {
   const [selectedDate, setSelectedDate] = useState<string>('');
   
-  // Hook for main APOD (today or selected date)
-  const { data: todayApod, loading: todayLoading, error: todayError, refetch: refetchToday } = useApod(selectedDate || undefined);
-  
-  // Hook for recent APODs
+  const { data: todayApod, loading: todayLoading, error: todayError } = useApod(selectedDate || undefined);
   const { data: recentApods, loading: recentLoading, error: recentError } = useRecentApods(7);
-  
-  // Hook for random APODs
   const { data: randomApods, loading: randomLoading, error: randomError, refetch: refetchRandom } = useRandomApods(6);
 
-  const handleDateChange = (date: string) => {
-    setSelectedDate(date);
-  };
+  const handleDateChange = (date: string) => setSelectedDate(date);
+  const handleBackToToday = () => setSelectedDate('');
 
-  const handleBackToToday = () => {
-    setSelectedDate('');
-  };
+  const isDemoMode = recentApods.length === 0 && !recentLoading && !recentError;
 
   return (
     <>
-      {/* Hero Section */}
-      <Hero
-        apod={todayApod}
-        loading={todayLoading}
-        error={todayError}
-        onDateChange={handleDateChange}
-      />
+      {/* Hero Section - Siempre visible */}
+      <section id="today">
+        <Hero
+          apod={todayApod}
+          loading={todayLoading}
+          error={todayError}
+          onDateChange={handleDateChange}
+        />
+      </section>
 
-      {/* Back to Today Button (shown when viewing a specific date) */}
+      {/* Back to Today Button */}
       {selectedDate && (
         <div className="sticky top-4 z-50 flex justify-center">
           <button
@@ -47,8 +41,8 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Recent Gallery */}
-      {!selectedDate && (
+      {/* Gallery Section - Siempre visible */}
+      <section id="gallery" className="py-20">
         <Gallery
           title="Recent Cosmic Discoveries"
           subtitle="Explore the latest astronomical wonders captured in the past week"
@@ -56,10 +50,10 @@ export default function HomePage() {
           loading={recentLoading}
           error={recentError}
         />
-      )}
+      </section>
 
-      {/* Random Gallery */}
-      <div id="random">
+      {/* Random Gallery Section - Siempre visible */}
+      <section id="random" className="py-20 bg-gray-50 dark:bg-gray-900">
         <Gallery
           title="Random Cosmic Wonders"
           subtitle="Discover random gems from NASA's vast collection of astronomical imagery"
@@ -69,7 +63,7 @@ export default function HomePage() {
           onRefresh={refetchRandom}
           showRefreshButton={true}
         />
-      </div>
+      </section>
 
       {/* Info Section */}
       <section className="py-20 bg-white dark:bg-gray-800">
