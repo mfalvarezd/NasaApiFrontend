@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ApodData } from '@/types/apod';
 import { fetchApod, fetchRecentApods, fetchRandomApods } from '@/utils/api';
 
@@ -97,7 +97,7 @@ export const useRandomApods = (count: number = 5) => {
     error: null,
   });
 
-  const loadRandomApods = async () => {
+  const loadRandomApods = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
@@ -110,15 +110,15 @@ export const useRandomApods = (count: number = 5) => {
         error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
-  };
+  }, [count]); // Dependencia count para useCallback
 
   useEffect(() => {
     loadRandomApods();
-  }, [count]);
+  }, [loadRandomApods]); // Ahora usamos loadRandomApods como dependencia
 
-  const refetch = () => {
+  const refetch = useCallback(() => {
     loadRandomApods();
-  };
+  }, [loadRandomApods]);
 
   return { ...state, refetch };
 };
