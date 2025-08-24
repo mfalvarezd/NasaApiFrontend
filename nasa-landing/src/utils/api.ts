@@ -125,7 +125,6 @@ export const fetchApodRange = async (
 
 // Función para obtener un número específico de APODs aleatorios - Con mensaje mejorado para DEMO_KEY
 export const fetchRandomApods = async (count: number = 5): Promise<ApodData[]> => {
-  // Si está usando DEMO_KEY, retornar array vacío silenciosamente en lugar de error
   if (NASA_API_KEY === 'DEMO_KEY') {
     console.log('Random images skipped - requires personal API key');
     return [];
@@ -139,11 +138,21 @@ export const fetchRandomApods = async (count: number = 5): Promise<ApodData[]> =
 
     const response = await fetchWithRetry(BASE_URL, params);
     return response.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching random APODs:', error);
-    if (error.message?.includes('Rate limit')) {
-      throw new Error('Too many requests. Please wait and try again.');
+    
+    if (error instanceof Error) {
+      if (error.message.includes('Rate limit')) {
+        throw new Error('Too many requests. Please wait and try again.');
+      }
     }
+    
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 429) {
+        throw new Error('Too many requests. Please wait and try again.');
+      }
+    }
+    
     throw new Error('Failed to fetch random APOD data');
   }
 };
