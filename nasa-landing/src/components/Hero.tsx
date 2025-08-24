@@ -50,7 +50,7 @@ const Hero: React.FC<HeroProps> = ({ apod, loading, error, onDateChange }) => {
   if (loading) {
     return (
       <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-        <Loading size="lg" text="Loading today's cosmic wonder..." />
+        <Loading size="lg" text="Loading today&apos;s cosmic wonder..." />
       </section>
     );
   }
@@ -231,7 +231,7 @@ const Hero: React.FC<HeroProps> = ({ apod, loading, error, onDateChange }) => {
                     if (navigator.share) {
                       navigator.share({
                         title: apod.title,
-                        text: `Check out today's Astronomy Picture of the Day: ${apod.title}`,
+                        text: `Check out today&apos;s Astronomy Picture of the Day: ${apod.title}`,
                         url: window.location.href,
                       });
                     } else {
@@ -277,7 +277,7 @@ const Hero: React.FC<HeroProps> = ({ apod, loading, error, onDateChange }) => {
                     </svg>
                     <div className="text-sm text-yellow-200">
                       <p className="font-medium mb-1">
-                        Image couldn't be loaded
+                        Image couldn&apos;t be loaded
                       </p>
                       <p>
                         This might be due to API rate limits. Get your free NASA

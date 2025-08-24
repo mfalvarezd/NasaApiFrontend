@@ -56,7 +56,7 @@ export default function HomePage() {
       <section id="random" className="py-20 bg-gray-50 dark:bg-gray-900">
         <Gallery
           title="Random Cosmic Wonders"
-          subtitle="Discover random gems from NASA's vast collection of astronomical imagery"
+          subtitle="Discover random gems from NASA&apos;s vast collection of astronomical imagery"
           apods={randomApods}
           loading={randomLoading}
           error={randomError}
@@ -128,7 +128,7 @@ export default function HomePage() {
                 Start Your Cosmic Journey
               </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
-                Whether you're an astronomy enthusiast, student, or simply curious about the universe, 
+                Whether you&apos;re an astronomy enthusiast, student, or simply curious about the universe, 
                 APOD offers a daily dose of cosmic wonder that will expand your understanding of space.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
@@ -139,7 +139,7 @@ export default function HomePage() {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
                   </svg>
-                  <span>View Today's Image</span>
+                  <span>View Today&apos;s Image</span>
                 </a>
                 <a
                   href="https://apod.nasa.gov/"

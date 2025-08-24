@@ -6,18 +6,18 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'NASA APOD - Astronomy Picture of the Day',
-  description: 'Explore the cosmos with NASA\'s Astronomy Picture of the Day. Discover breathtaking images and videos of our universe, complete with expert explanations.',
+  description: 'Explore the cosmos with NASA&apos;s Astronomy Picture of the Day. Discover breathtaking images and videos of our universe, complete with expert explanations.',
   keywords: ['NASA', 'astronomy', 'space', 'cosmos', 'pictures', 'APOD'],
   authors: [{ name: 'NASA APOD Explorer' }],
   openGraph: {
     title: 'NASA APOD - Astronomy Picture of the Day',
-    description: 'Explore the cosmos with NASA\'s Astronomy Picture of the Day',
+    description: 'Explore the cosmos with NASA&apos;s Astronomy Picture of the Day',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'NASA APOD - Astronomy Picture of the Day',
-    description: 'Explore the cosmos with NASA\'s Astronomy Picture of the Day',
+    description: 'Explore the cosmos with NASA&apos;s Astronomy Picture of the Day',
   },
 };
 
@@ -84,7 +84,7 @@ export default function RootLayout({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="text-center">
               <p className="text-gray-600 dark:text-gray-400 mb-2">
-                Powered by NASA's Astronomy Picture of the Day API
+                Powered by NASA&apos;s Astronomy Picture of the Day API
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-500">
                 Images and videos are courtesy of NASA and may be subject to copyright.
