@@ -1,47 +1,49 @@
-import axios from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { ApodData } from '@/types/apod';
 
 const NASA_API_KEY = process.env.NEXT_PUBLIC_NASA_API_KEY || 'DEMO_KEY';
 const BASE_URL = 'https://api.nasa.gov/planetary/apod';
 
-// Función para esperar entre requests
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms: number): Promise<void> => 
+  new Promise(resolve => setTimeout(resolve, ms));
 
-// Función para obtener APOD con retry y rate limiting
-const fetchWithRetry = async (url: string, params: any, maxRetries: number = 3): Promise<any> => {
+const fetchWithRetry = async (
+  url: string, 
+  params: Record<string, string | number>, 
+  maxRetries: number = 3
+): Promise<AxiosResponse> => {
   for (let i = 0; i < maxRetries; i++) {
     try {
-      // Agregar delay entre requests si no es el primer intento
       if (i > 0) {
-        await delay(2000 * i); // 2s, 4s, 6s delays
+        await delay(2000 * i);
       }
       
       const response = await axios.get(url, { 
         params,
-        timeout: 10000 // 10 second timeout
+        timeout: 10000
       });
       return response;
-    } catch (error: any) {
-      console.log(`Attempt ${i + 1} failed:`, error.response?.status || error.code);
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      console.log(`Attempt ${i + 1} failed:`, axiosError.response?.status || axiosError.code);
       
-      if (error.response?.status === 429) {
+      if (axiosError.response?.status === 429) {
         if (i === maxRetries - 1) {
           throw new Error('Rate limit exceeded. The free NASA API key (DEMO_KEY) has limited requests. Get your own free API key at https://api.nasa.gov/ for unlimited access.');
         }
-        // Wait longer for rate limit errors
         await delay(5000 * (i + 1));
         continue;
       }
       
-      if (error.response?.status === 403) {
+      if (axiosError.response?.status === 403) {
         throw new Error('API access forbidden. Please check your NASA API key or get a free one at https://api.nasa.gov/');
       }
       
-      if (error.response?.status === 400) {
+      if (axiosError.response?.status === 400) {
         throw new Error('Invalid request. The selected date might be outside the available range (since June 16, 1995).');
       }
       
-      if (error.code === 'ECONNABORTED' || error.code === 'TIMEOUT') {
+      if (axiosError.code === 'ECONNABORTED' || axiosError.code === 'TIMEOUT') {
         if (i === maxRetries - 1) {
           throw new Error('Request timeout. Please check your internet connection and try again.');
         }
@@ -53,12 +55,12 @@ const fetchWithRetry = async (url: string, params: any, maxRetries: number = 3):
       }
     }
   }
+  throw new Error('Max retries exceeded');
 };
 
-// Función para obtener APOD de una fecha específica o del día actual
 export const fetchApod = async (date?: string): Promise<ApodData> => {
   try {
-    const params = {
+    const params: Record<string, string> = {
       api_key: NASA_API_KEY,
       ...(date && { date }),
     };
@@ -67,52 +69,43 @@ export const fetchApod = async (date?: string): Promise<ApodData> => {
     const response = await fetchWithRetry(BASE_URL, params);
     console.log('APOD response:', response.data);
     return response.data;
-  } catch (error: any) {
-    console.error('Error fetching APOD:', error);
+  } catch (error) {
+    const err = error as Error;
+    console.error('Error fetching APOD:', err);
     
-    if (error.message?.includes('Rate limit')) {
-      throw error; // Re-throw the custom rate limit message
+    if (err instanceof Error) {
+      if (err.message.includes('Rate limit') ||
+          err.message.includes('API access forbidden') ||
+          err.message.includes('Invalid request') ||
+          err.message.includes('timeout')) {
+        throw err;
+      }
     }
     
-    if (error.message?.includes('API access forbidden')) {
-      throw error;
-    }
-    
-    if (error.message?.includes('Invalid request')) {
-      throw error;
-    }
-    
-    if (error.message?.includes('timeout')) {
-      throw error;
-    }
-    
-    if (error.response?.status >= 500) {
-      throw new Error('NASA API is temporarily unavailable. Please try again later.');
-    }
-    
-    // Generic network error
-    if (!error.response) {
-      throw new Error('Network error. Please check your internet connection and try again.');
+    if (axios.isAxiosError(error)) {
+      if (error.response && typeof error.response.status === 'number' && error.response.status >= 500) {
+        throw new Error('NASA API is temporarily unavailable. Please try again later.');
+      }
+      
+      if (!error.response) {
+        throw new Error('Network error. Please check your internet connection and try again.');
+      }
     }
     
     throw new Error('Failed to fetch APOD data. Please try again.');
   }
 };
 
-// Función para obtener múltiples APODs (rango de fechas) - Con mejor manejo para DEMO_KEY
 export const fetchApodRange = async (
   startDate: string,
   endDate: string
 ): Promise<ApodData[]> => {
-  // Si está usando DEMO_KEY, mostrar mensaje más claro
   if (NASA_API_KEY === 'DEMO_KEY') {
     throw new Error('Gallery features require a personal NASA API key due to rate limits. Get yours free at https://api.nasa.gov/ - it only takes 2 minutes!');
-  } else {
-    console.log(NASA_API_KEY);
   }
 
   try {
-    const params = {
+    const params: Record<string, string> = {
       api_key: NASA_API_KEY,
       start_date: startDate,
       end_date: endDate,
@@ -120,9 +113,10 @@ export const fetchApodRange = async (
 
     const response = await fetchWithRetry(BASE_URL, params);
     return response.data;
-  } catch (error: any) {
-    console.error('Error fetching APOD range:', error);
-    if (error.message?.includes('Rate limit')) {
+  } catch (error) {
+    const err = error as Error;
+    console.error('Error fetching APOD range:', err);
+    if (err.message.includes('Rate limit')) {
       throw new Error('Too many requests. Please wait and try again.');
     }
     throw new Error('Failed to fetch APOD range data');
