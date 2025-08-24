@@ -15,7 +15,6 @@ export default function HomePage() {
   const handleDateChange = (date: string) => setSelectedDate(date);
   const handleBackToToday = () => setSelectedDate('');
 
-  const isDemoMode = recentApods.length === 0 && !recentLoading && !recentError;
 
   return (
     <>
